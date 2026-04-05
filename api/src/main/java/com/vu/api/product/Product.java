@@ -6,8 +6,10 @@ import lombok.*;
 
 @Entity
 @Table(name = "products")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Product {
 
@@ -15,10 +17,8 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
     private Double price;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
