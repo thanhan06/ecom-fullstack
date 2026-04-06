@@ -27,9 +27,7 @@ public class ProductController {
                                                                HttpServletRequest httpReq) {
         ProductResponse data = service.createProduct(req);
 
-        return ResponseEntity
-                .created(URI.create("/products/" + data.id()))
-                .body(ApiResponses.created(httpReq, data).getBody()); // cách này để giữ Location
+        return ApiResponses.created(httpReq, URI.create("/products/" + data.id()), data);
     }
 
     @GetMapping("/{id}")

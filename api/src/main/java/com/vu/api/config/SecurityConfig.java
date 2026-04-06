@@ -20,7 +20,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // cho Postman POST/PUT/DELETE dễ test
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/health", "/categories/**","/products/**").permitAll()
+                .requestMatchers("/health", "/categories/**","/products/**","/users/**").permitAll()
                 .anyRequest().authenticated()
             )
             .build();

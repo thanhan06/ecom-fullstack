@@ -27,14 +27,7 @@ public class CategoryController {
     public ResponseEntity<ApiResponse<CategoryResponse>> create(@Valid @RequestBody CategoryCreateRequest req,
                                                                 HttpServletRequest httpReq) {
         CategoryResponse data = service.create(req);
-
-        // nếu muốn Location header:
-        return ResponseEntity
-                .created(URI.create("/categories/" + data.id()))
-                .body(ApiResponses.created(httpReq, data).getBody()); // tạm thời
-
-        // nếu không cần Location:
-        // return ApiResponses.created(httpReq, data);
+        return ApiResponses.created(httpReq, URI.create("/categories/" + data.id()), data);
     }
 
     @GetMapping
