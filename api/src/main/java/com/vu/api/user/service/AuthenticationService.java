@@ -80,7 +80,7 @@ public class AuthenticationService {
     }
 
     private String generateToken(User user) throws JOSEException {
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getEmail())
