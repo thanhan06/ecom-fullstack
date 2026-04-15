@@ -1,8 +1,9 @@
-package com.vu.api.user;
+package com.vu.api.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,6 +23,9 @@ public class User {
 
     @Column(nullable = false)
     private String passwordHash;
+
+    @Column(name = "dob")
+    private LocalDate dob;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

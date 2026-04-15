@@ -1,4 +1,4 @@
-package com.vu.api.user;
+package com.vu.api.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,20 +7,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "permissions")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
-public class Role {
+public class Permission {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String name; // "ADMIN", "USER", ...
+    private String name;
 
-    @OneToMany(mappedBy = "role")
-    @Builder.Default
-    private Set<UserRole> userRoles = new HashSet<>();
+    private String description;
 }

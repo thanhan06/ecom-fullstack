@@ -21,8 +21,16 @@ public enum ErrorCode {
     ROLE_NOT_FOUND("ROLE_NOT_FOUND", HttpStatus.NOT_FOUND, "Role not found"),
     USER_ROLE_EXISTS("USER_ROLE_EXISTS", HttpStatus.CONFLICT, "User already has this role"),
     USER_ROLE_NOT_FOUND("USER_ROLE_NOT_FOUND", HttpStatus.NOT_FOUND, "User does not have this role"),
-    USER_EMAIL_EXISTS("USER_EMAIL_EXISTS", HttpStatus.CONFLICT, "Email already exists");
+    USER_EMAIL_EXISTS("USER_EMAIL_EXISTS", HttpStatus.CONFLICT, "Email already exists"),
+    //AUTH
+    LOGIN_FAILED("LOGIN_FAILED", HttpStatus.UNAUTHORIZED, "Invalid email or password"),
+    UNAUTHENTICATED("UNAUTHENTICATED", HttpStatus.UNAUTHORIZED, "Authentication required"),
+    UNAUTHORIZED("UNAUTHORIZED", HttpStatus.FORBIDDEN, "You do not have permission to access this resource"),
 
+    //VALIDATION
+
+    INVALID_DOB("INVALID_DOB", HttpStatus.BAD_REQUEST, "Your age must be at least {min} years old"),
+    INVALID_PASSWORD("INVALID_PASSWORD", HttpStatus.BAD_REQUEST, "Password must be at least {min} characters long and at most 100 characters long");
     private final String code;
     private final HttpStatus status;
     private final String message;

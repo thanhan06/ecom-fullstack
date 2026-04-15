@@ -1,4 +1,4 @@
-package com.vu.api.user;
+package com.vu.api.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

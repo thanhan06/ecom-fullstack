@@ -1,5 +1,6 @@
-package com.vu.api.user;
+package com.vu.api.user.repository;
 
+import com.vu.api.user.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

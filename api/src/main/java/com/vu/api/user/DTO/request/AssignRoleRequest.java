@@ -1,4 +1,4 @@
-package com.vu.api.user.DTO;
+package com.vu.api.user.DTO.request;
 
 import jakarta.validation.constraints.NotBlank;
 
