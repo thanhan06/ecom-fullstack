@@ -47,6 +47,15 @@ public class AuthenticationService {
     @NonFinal
     @Value("${jwt.signerKey}")
     protected String SIGNING_KEY;
+
+    @NonFinal
+    @Value("${jwt.valid-duration}")
+    protected Long VALID_DURATION;
+
+    @NonFinal
+    @Value("${jwt.refreshable-duration}")
+    protected Long REFRESHABLE_DURATION;
+
     public boolean authenticate(AuthenticationRequest request){
         var user = userRepository.findByEmailIgnoreCase(request.email())
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
@@ -60,7 +69,7 @@ public class AuthenticationService {
         var token = request.token();
         boolean isValid = true;
         try{
-            verifyToken(token);
+            verifyToken(token, false);
         }catch (ApiException e){
             isValid = false;
         }
@@ -87,7 +96,7 @@ public class AuthenticationService {
                 .issuer("api.vu.com")
                 .issueTime(new java.util.Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
+                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()
                 ))
                 .claim("scope", buildScope(user)) // TODO: lấy roles thực tế của user
                 .jwtID(UUID.randomUUID().toString())
@@ -122,7 +131,7 @@ public class AuthenticationService {
     }
 
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
-        var signedJwt = verifyToken(request.token());
+        var signedJwt = verifyToken(request.token(), true);
         String jti = signedJwt.getJWTClaimsSet().getJWTID();
         Date exp = signedJwt.getJWTClaimsSet().getExpirationTime();
 
@@ -135,13 +144,16 @@ public class AuthenticationService {
 
     }
 
-    private SignedJWT verifyToken(String token) throws ParseException, JOSEException {
+    private SignedJWT verifyToken(String token, boolean isRefresh) throws ParseException, JOSEException {
         JWSVerifier verifier = new MACVerifier(SIGNING_KEY.getBytes());
-        Date exp = SignedJWT.parse(token).getJWTClaimsSet().getExpirationTime();
         SignedJWT signedJWT = SignedJWT.parse(token);
 
+        Date exp = isRefresh ? new Date(signedJWT.getJWTClaimsSet().getIssueTime().toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli()) :
+                signedJWT.getJWTClaimsSet().getExpirationTime();
 
-        if(!(signedJWT.verify(verifier) && exp.after(new Date())))
+        var verified = signedJWT.verify(verifier);
+
+        if(!(verified && exp.after(new Date())))
             throw new ApiException(ErrorCode.UNAUTHENTICATED);
 
         if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
@@ -154,7 +166,7 @@ public class AuthenticationService {
 
     @Transactional
     public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
-        var signedJwt = verifyToken(request.token());
+        var signedJwt = verifyToken(request.token(), true);
         
         String jti = signedJwt.getJWTClaimsSet().getJWTID();
         Date exp = signedJwt.getJWTClaimsSet().getExpirationTime();

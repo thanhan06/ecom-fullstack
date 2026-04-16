@@ -6,13 +6,20 @@ import com.vu.api.user.entity.User;
 import com.vu.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "spring",
+    value = "datasource.driverClassName",
+havingValue = "org.postgresql.Driver")
 public class AdminStaffSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;

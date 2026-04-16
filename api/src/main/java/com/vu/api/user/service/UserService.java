@@ -13,6 +13,7 @@ import com.vu.api.user.repository.UserRepository;
 import com.vu.api.user.repository.UserRoleRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class UserService {
 
@@ -49,6 +51,7 @@ public class UserService {
 
     @Transactional
     public UserResponse create(UserCreateRequest req) {
+        log.info("Creating user with email: {}", req.email());
         if (userRepo.existsByEmailIgnoreCase(req.email())) {
             throw new ApiException(ErrorCode.USER_EMAIL_EXISTS);
         }
