@@ -1,10 +1,11 @@
 package com.vu.api.user.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
 import com.vu.api.user.DTO.request.RoleCreateRequest;
 import com.vu.api.user.DTO.response.RoleResponse;
 import com.vu.api.user.entity.Role;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface RoleMapper {

@@ -1,12 +1,15 @@
 package com.vu.api.category;
 
 import jakarta.persistence.*;
+
 import lombok.*;
 
 @Entity
 @Table(name = "categories")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Category {
 

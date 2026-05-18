@@ -1,9 +1,9 @@
 package com.vu.api.product;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import java.util.Optional;
 
 public interface ProductRespository extends JpaRepository<Product, Long> {
     boolean existsByNameIgnoreCase(String name);

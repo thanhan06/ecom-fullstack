@@ -1,18 +1,19 @@
 package com.vu.api.user.mapper;
 
-import com.vu.api.user.DTO.response.RoleResponse;
-import com.vu.api.user.DTO.response.UserResponse;
-import com.vu.api.user.entity.User;
-import com.vu.api.user.entity.UserRole;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.Objects;
+import com.vu.api.user.DTO.response.RoleResponse;
+import com.vu.api.user.DTO.response.UserResponse;
+import com.vu.api.user.entity.User;
+import com.vu.api.user.entity.UserRole;
 
 @Mapper(componentModel = "spring")
 public abstract class UserMapper {

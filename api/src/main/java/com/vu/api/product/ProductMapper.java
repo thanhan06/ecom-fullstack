@@ -1,10 +1,11 @@
 package com.vu.api.product;
 
+import org.mapstruct.*;
+
 import com.vu.api.category.Category;
 import com.vu.api.product.DTO.ProductCreateRequest;
 import com.vu.api.product.DTO.ProductResponse;
 import com.vu.api.product.DTO.ProductUpdateRequest;
-import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {

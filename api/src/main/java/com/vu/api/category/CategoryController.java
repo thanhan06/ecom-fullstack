@@ -1,17 +1,19 @@
 package com.vu.api.category;
 
+import java.net.URI;
+import java.util.List;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.vu.api.category.DTO.CategoryCreateRequest;
 import com.vu.api.category.DTO.CategoryResponse;
 import com.vu.api.category.DTO.CategoryUpdateRequest;
 import com.vu.api.common.ApiResponse;
 import com.vu.api.common.ApiResponses;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/categories")
@@ -24,8 +26,8 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CategoryResponse>> create(@Valid @RequestBody CategoryCreateRequest req,
-                                                                HttpServletRequest httpReq) {
+    public ResponseEntity<ApiResponse<CategoryResponse>> create(
+            @Valid @RequestBody CategoryCreateRequest req, HttpServletRequest httpReq) {
         CategoryResponse data = service.create(req);
         return ApiResponses.created(httpReq, URI.create("/categories/" + data.id()), data);
     }
@@ -36,9 +38,8 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> update(@PathVariable Long id,
-                                                                @Valid @RequestBody CategoryUpdateRequest req,
-                                                                HttpServletRequest httpReq) {
+    public ResponseEntity<ApiResponse<CategoryResponse>> update(
+            @PathVariable Long id, @Valid @RequestBody CategoryUpdateRequest req, HttpServletRequest httpReq) {
         return ApiResponses.ok(httpReq, service.update(id, req));
     }
 }

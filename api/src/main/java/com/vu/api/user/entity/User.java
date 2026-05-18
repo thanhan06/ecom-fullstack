@@ -1,16 +1,19 @@
 package com.vu.api.user.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.*;
+
+import lombok.*;
+
 @Entity
 @Table(name = "users")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class User {
 
@@ -18,7 +21,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    // PostgreSQL: CITEXT makes comparisons case-insensitive at DB-level
+    // (similar idea to specifying a case-insensitive collation in MySQL).
+    // NOTE: Requires the DB extension: CREATE EXTENSION IF NOT EXISTS citext;
+    @Column(nullable = false, unique = true, length = 100, columnDefinition = "citext")
     private String email;
 
     @Column(nullable = false)
@@ -32,10 +38,7 @@ public class User {
     private Set<UserRole> userRoles = new HashSet<>();
 
     public void addRole(Role role) {
-        UserRole ur = UserRole.builder()
-                .user(this)
-                .role(role)
-                .build();
+        UserRole ur = UserRole.builder().user(this).role(role).build();
         userRoles.add(ur);
     }
 

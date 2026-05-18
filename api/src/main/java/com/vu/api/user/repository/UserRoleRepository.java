@@ -1,7 +1,8 @@
 package com.vu.api.user.repository;
 
-import com.vu.api.user.entity.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.vu.api.user.entity.UserRole;
 
 public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
 
@@ -10,5 +11,4 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
     void deleteByUserIdAndRoleId(Long userId, Long roleId);
 
     void deleteByUserId(Long userId);
-
 }

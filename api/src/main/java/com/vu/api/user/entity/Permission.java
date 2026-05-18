@@ -1,15 +1,15 @@
 package com.vu.api.user.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import lombok.*;
 
 @Entity
 @Table(name = "permissions")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Permission {
 

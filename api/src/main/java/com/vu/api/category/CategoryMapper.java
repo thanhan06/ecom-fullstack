@@ -1,9 +1,10 @@
 package com.vu.api.category;
 
+import org.mapstruct.*;
+
 import com.vu.api.category.DTO.CategoryCreateRequest;
 import com.vu.api.category.DTO.CategoryResponse;
 import com.vu.api.category.DTO.CategoryUpdateRequest;
-import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {

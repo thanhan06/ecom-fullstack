@@ -1,11 +1,12 @@
 package com.vu.api.common;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
 import java.net.URI;
 import java.time.Instant;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public final class ApiResponses {
     private ApiResponses() {}
@@ -20,27 +21,14 @@ public final class ApiResponses {
 
     // NEW: created + Location header
     public static <T> ResponseEntity<ApiResponse<T>> created(HttpServletRequest req, URI location, T data) {
-        ApiResponse<T> body = new ApiResponse<>(
-                Instant.now(),
-                HttpStatus.CREATED.value(),
-                "Created",
-                req.getRequestURI(),
-                data
-        );
+        ApiResponse<T> body =
+                new ApiResponse<>(Instant.now(), HttpStatus.CREATED.value(), "Created", req.getRequestURI(), data);
         return ResponseEntity.created(location).body(body);
     }
 
-    public static <T> ResponseEntity<ApiResponse<T>> build(HttpServletRequest req,
-                                                           HttpStatus status,
-                                                           String message,
-                                                           T data) {
-        ApiResponse<T> body = new ApiResponse<>(
-                Instant.now(),
-                status.value(),
-                message,
-                req.getRequestURI(),
-                data
-        );
+    public static <T> ResponseEntity<ApiResponse<T>> build(
+            HttpServletRequest req, HttpStatus status, String message, T data) {
+        ApiResponse<T> body = new ApiResponse<>(Instant.now(), status.value(), message, req.getRequestURI(), data);
         return ResponseEntity.status(status).body(body);
     }
 }

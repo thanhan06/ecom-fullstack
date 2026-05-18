@@ -1,7 +1,9 @@
 package com.vu.api.product;
 
-import com.vu.api.category.Category;
 import jakarta.persistence.*;
+
+import com.vu.api.category.Category;
+
 import lombok.*;
 
 @Entity

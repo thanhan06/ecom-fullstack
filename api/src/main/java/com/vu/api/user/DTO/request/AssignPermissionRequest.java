@@ -1,10 +1,7 @@
 package com.vu.api.user.DTO.request;
 
-import jakarta.validation.constraints.NotEmpty;
-
 import java.util.Set;
 
-public record AssignPermissionRequest(
-        @NotEmpty Set<Long> permissionIds
-) {}
+import jakarta.validation.constraints.NotEmpty;
 
+public record AssignPermissionRequest(@NotEmpty Set<Long> permissionIds) {}

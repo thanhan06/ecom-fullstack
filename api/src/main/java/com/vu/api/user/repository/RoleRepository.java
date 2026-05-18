@@ -1,9 +1,10 @@
 package com.vu.api.user.repository;
 
-import com.vu.api.user.entity.Role;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import com.vu.api.user.entity.Role;
 
 public interface RoleRepository extends JpaRepository<Role, Long> {
     Optional<Role> findByNameIgnoreCase(String name);

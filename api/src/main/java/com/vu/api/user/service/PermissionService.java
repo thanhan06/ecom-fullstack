@@ -1,17 +1,19 @@
 package com.vu.api.user.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.vu.api.user.DTO.request.PermissionCreateRequest;
 import com.vu.api.user.DTO.response.PermissionResponse;
+import com.vu.api.user.entity.Permission;
 import com.vu.api.user.mapper.PermissionMapper;
 import com.vu.api.user.repository.PermissionRepository;
-import com.vu.api.user.entity.Permission;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -30,10 +32,9 @@ public class PermissionService {
 
     public List<PermissionResponse> getAll() {
         List<Permission> permissions = permissionRepository.findAll();
-        return permissions.stream()
-                .map(permissionMapper::toResponse)
-                .toList();
+        return permissions.stream().map(permissionMapper::toResponse).toList();
     }
+
     public void deleteById(Long id) {
         permissionRepository.deleteById(id);
     }

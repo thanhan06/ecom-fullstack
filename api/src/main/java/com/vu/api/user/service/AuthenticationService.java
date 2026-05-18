@@ -1,5 +1,17 @@
 package com.vu.api.user.service;
 
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.StringJoiner;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -9,31 +21,21 @@ import com.vu.api.common.ApiException;
 import com.vu.api.common.ErrorCode;
 import com.vu.api.config.SecurityBeans;
 import com.vu.api.user.DTO.request.AuthenticationRequest;
+import com.vu.api.user.DTO.request.IntrospectRequest;
 import com.vu.api.user.DTO.request.LogoutRequest;
 import com.vu.api.user.DTO.request.RefreshRequest;
 import com.vu.api.user.DTO.response.AuthenticationResponse;
-import com.vu.api.user.DTO.request.IntrospectRequest;
 import com.vu.api.user.DTO.response.IntrospectResponse;
 import com.vu.api.user.entity.InvalidatedToken;
 import com.vu.api.user.entity.User;
 import com.vu.api.user.repository.InvalidatedTokenRepository;
 import com.vu.api.user.repository.UserRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -56,33 +58,33 @@ public class AuthenticationService {
     @Value("${jwt.refreshable-duration}")
     protected Long REFRESHABLE_DURATION;
 
-    public boolean authenticate(AuthenticationRequest request){
-        var user = userRepository.findByEmailIgnoreCase(request.email())
+    public boolean authenticate(AuthenticationRequest request) {
+        var user = userRepository
+                .findByEmailIgnoreCase(request.email())
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
 
         return securityBeans.passwordEncoder().matches(request.password(), user.getPasswordHash());
-
-
     }
 
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
         var token = request.token();
         boolean isValid = true;
-        try{
+        try {
             verifyToken(token, false);
-        }catch (ApiException e){
+        } catch (ApiException e) {
             isValid = false;
         }
         return new IntrospectResponse(isValid);
-
     }
+
     @Transactional
     public AuthenticationResponse login(AuthenticationRequest request) throws JOSEException {
-        if (authenticate(request)){
-            User user = userRepository.findByEmailWithRolesIgnoreCase(request.email())
+        if (authenticate(request)) {
+            User user = userRepository
+                    .findByEmailWithRolesIgnoreCase(request.email())
                     .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
             var token = generateToken(user);
-            return new AuthenticationResponse(true,token);
+            return new AuthenticationResponse(true, token);
         } else {
             throw new ApiException(ErrorCode.LOGIN_FAILED);
         }
@@ -96,30 +98,25 @@ public class AuthenticationService {
                 .issuer("api.vu.com")
                 .issueTime(new java.util.Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()
-                ))
+                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
                 .claim("scope", buildScope(user)) // TODO: lấy roles thực tế của user
                 .jwtID(UUID.randomUUID().toString())
                 .build();
 
         Payload payload = new Payload(claimsSet.toJSONObject());
-        JWSObject jwsObject = new JWSObject(
-                header,
-                payload
-        );
-        try{
-                jwsObject.sign(new MACSigner(SIGNING_KEY.getBytes()));
-                return jwsObject.serialize();
-            } catch (JOSEException e){
-                log.error("Cannot create token",e);
-                throw new RuntimeException("Failed to sign JWT", e);
+        JWSObject jwsObject = new JWSObject(header, payload);
+        try {
+            jwsObject.sign(new MACSigner(SIGNING_KEY.getBytes()));
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            log.error("Cannot create token", e);
+            throw new RuntimeException("Failed to sign JWT", e);
         }
-
     }
 
-    private String buildScope(User user){
+    private String buildScope(User user) {
         StringJoiner sb = new StringJoiner(" ");
-        if(!CollectionUtils.isEmpty(user.getUserRoles())){
+        if (!CollectionUtils.isEmpty(user.getUserRoles())) {
             user.getUserRoles().forEach(ur -> {
                 sb.add("ROLE_" + ur.getRole().getName());
                 if (!CollectionUtils.isEmpty(ur.getRole().getPermissions())) {
@@ -135,52 +132,51 @@ public class AuthenticationService {
         String jti = signedJwt.getJWTClaimsSet().getJWTID();
         Date exp = signedJwt.getJWTClaimsSet().getExpirationTime();
 
-        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
-                .id(jti)
-                .expiryTime(exp)
-                .build();
+        InvalidatedToken invalidatedToken =
+                InvalidatedToken.builder().id(jti).expiryTime(exp).build();
 
         invalidatedTokenRepository.save(invalidatedToken);
-
     }
 
     private SignedJWT verifyToken(String token, boolean isRefresh) throws ParseException, JOSEException {
         JWSVerifier verifier = new MACVerifier(SIGNING_KEY.getBytes());
         SignedJWT signedJWT = SignedJWT.parse(token);
 
-        Date exp = isRefresh ? new Date(signedJWT.getJWTClaimsSet().getIssueTime().toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli()) :
-                signedJWT.getJWTClaimsSet().getExpirationTime();
+        Date exp = isRefresh
+                ? new Date(signedJWT
+                        .getJWTClaimsSet()
+                        .getIssueTime()
+                        .toInstant()
+                        .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)
+                        .toEpochMilli())
+                : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(verifier);
 
-        if(!(verified && exp.after(new Date())))
-            throw new ApiException(ErrorCode.UNAUTHENTICATED);
+        if (!(verified && exp.after(new Date()))) throw new ApiException(ErrorCode.UNAUTHENTICATED);
 
         if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
             throw new ApiException(ErrorCode.UNAUTHENTICATED);
 
         return signedJWT;
-
-
     }
 
     @Transactional
     public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
         var signedJwt = verifyToken(request.token(), true);
-        
+
         String jti = signedJwt.getJWTClaimsSet().getJWTID();
         Date exp = signedJwt.getJWTClaimsSet().getExpirationTime();
 
-        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
-                .id(jti)
-                .expiryTime(exp)
-                .build();
+        InvalidatedToken invalidatedToken =
+                InvalidatedToken.builder().id(jti).expiryTime(exp).build();
 
         invalidatedTokenRepository.save(invalidatedToken);
-        
+
         String email = signedJwt.getJWTClaimsSet().getSubject();
-        
-        User user = userRepository.findByEmailWithRolesIgnoreCase(email)
+
+        User user = userRepository
+                .findByEmailWithRolesIgnoreCase(email)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
         var token = generateToken(user);
         return new AuthenticationResponse(true, token);

@@ -1,19 +1,23 @@
 package com.vu.api.user.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.Instant;
+
+import jakarta.persistence.*;
+
+import lombok.*;
 
 @Entity
 @Table(
         name = "user_roles",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uq_user_roles_user_role", columnNames = {"user_id", "role_id"})
-        }
-)
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+            @UniqueConstraint(
+                    name = "uq_user_roles_user_role",
+                    columnNames = {"user_id", "role_id"})
+        })
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class UserRole {
 
