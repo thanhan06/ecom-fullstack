@@ -4,11 +4,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.vu.api.entity.UserEntity;
+import com.vu.api.DTO.request.UserCreationRequest;
+import com.vu.api.DTO.response.UserResponse;
 
 @Service
 public interface UserService {
-    public List<UserEntity> getAllUsers();
+    public List<UserResponse> getAllUsers();
 
-    public UserEntity getUserByUserId(String user_id);
+    public UserResponse getUserByUserId(String user_id);
+
+    public UserResponse createUser(UserCreationRequest userCreationRequest);
 }

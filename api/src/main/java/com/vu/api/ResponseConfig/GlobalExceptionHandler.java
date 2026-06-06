@@ -13,7 +13,7 @@ import com.vu.api.ErrorConfig.ErrorCode;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(ApiException.class)
     public ResponseEntity<ApiError> handleApi(ApiException ex, HttpServletRequest req) {
         ErrorCode ec = ex.getErrorCode();
         return ResponseEntity.status(ec.status())
