@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -59,5 +60,21 @@ public class UserServiceImpl implements UserService {
                         : passwordEncoder.encode(userCreationRequest.password()));
         userRepository.save(userEntity);
         return userMapper.toUserResponse(userEntity);
+    }
+
+    @Override
+    public UserResponse getMyInfo() {
+        var context = SecurityContextHolder.getContext();
+        if (context == null
+                || context.getAuthentication() == null
+                || !context.getAuthentication().isAuthenticated()) {
+            throw new ApiException(ErrorCode.USER_NOT_AUTHENTICATED);
+        }
+        String userId = context.getAuthentication().getName();
+        Optional<UserEntity> userEntity = userRepository.findByUserId(userId);
+        if (userEntity.isEmpty()) {
+            throw new ApiException(ErrorCode.USER_NOT_FOUND);
+        }
+        return userMapper.toUserResponse(userEntity.get());
     }
 }

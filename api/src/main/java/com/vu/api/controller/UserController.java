@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vu.api.DTO.request.UserCreationRequest;
@@ -23,24 +24,30 @@ import lombok.experimental.FieldDefaults;
 
 @RestController
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+@RequestMapping("/users")
 public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/users")
+    @GetMapping
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers(HttpServletRequest req) {
         return ApiResponses.ok(req, userService.getAllUsers());
     }
 
-    @GetMapping("/users/{user_id}")
+    @GetMapping("/{user_id}")
     public ResponseEntity<ApiResponse<UserResponse>> getUserByUserId(
             @PathVariable String user_id, HttpServletRequest req) {
         return ApiResponses.ok(req, userService.getUserByUserId(user_id));
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public ResponseEntity<ApiResponse<UserResponse>> createUser(
             @RequestBody @Valid UserCreationRequest userCreationRequest, HttpServletRequest req) {
         return ApiResponses.created(req, userService.createUser(userCreationRequest));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> getMyInfo(HttpServletRequest req) {
+        return ApiResponses.ok(req, userService.getMyInfo());
     }
 }

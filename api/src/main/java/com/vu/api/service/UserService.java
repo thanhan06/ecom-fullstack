@@ -14,4 +14,6 @@ public interface UserService {
     public UserResponse getUserByUserId(String user_id);
 
     public UserResponse createUser(UserCreationRequest userCreationRequest);
+
+    public UserResponse getMyInfo();
 }
