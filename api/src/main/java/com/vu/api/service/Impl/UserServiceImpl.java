@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vu.api.DTO.request.UserCreationRequest;
+import com.vu.api.DTO.request.UserUpdationRequest;
 import com.vu.api.DTO.response.UserResponse;
 import com.vu.api.ErrorConfig.ApiException;
 import com.vu.api.ErrorConfig.ErrorCode;
@@ -58,6 +59,27 @@ public class UserServiceImpl implements UserService {
                 userCreationRequest.password().isBlank()
                         ? null
                         : passwordEncoder.encode(userCreationRequest.password()));
+        userRepository.save(userEntity);
+        return userMapper.toUserResponse(userEntity);
+    }
+
+    @Override
+    public UserResponse updateUser(String user_id, UserUpdationRequest userUpdationRequest) {
+        Optional<UserEntity> userResult = userRepository.findByUserId(user_id);
+        if (userResult.isEmpty()) {
+            throw new ApiException(ErrorCode.USER_NOT_FOUND);
+        }
+        UserEntity userEntity = userResult.get();
+        if (userUpdationRequest.username().isPresent()) {
+            userEntity.setUsername(userUpdationRequest.username().get());
+        }
+        if (userUpdationRequest.password().isPresent()) {
+            userEntity.setPassword(
+                    passwordEncoder.encode(userUpdationRequest.password().get()));
+        }
+        if (userUpdationRequest.role().isPresent()) {
+            userEntity.setRole(userUpdationRequest.role().get());
+        }
         userRepository.save(userEntity);
         return userMapper.toUserResponse(userEntity);
     }

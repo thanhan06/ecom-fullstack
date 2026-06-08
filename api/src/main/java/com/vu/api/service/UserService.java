@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.vu.api.DTO.request.UserCreationRequest;
+import com.vu.api.DTO.request.UserUpdationRequest;
 import com.vu.api.DTO.response.UserResponse;
 
 @Service
@@ -14,6 +15,8 @@ public interface UserService {
     public UserResponse getUserByUserId(String user_id);
 
     public UserResponse createUser(UserCreationRequest userCreationRequest);
+
+    public UserResponse updateUser(String user_id, UserUpdationRequest userUpdationRequest);
 
     public UserResponse getMyInfo();
 }
