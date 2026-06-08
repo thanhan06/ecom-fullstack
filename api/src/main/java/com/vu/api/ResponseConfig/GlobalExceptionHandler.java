@@ -5,6 +5,7 @@ import java.time.Instant;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -32,6 +33,22 @@ public class GlobalExceptionHandler {
         ErrorCode ec = ErrorCode.valueOf(errorMessage); // Chuyển message thành ErrorCode enum
         // Trả về HTTP Status 400 (Bad Request) cùng với format ApiError của bạn
         // Lưu ý: Chỗ "VALIDATION_ERROR" bạn có thể đổi thành một Enum ErrorCode nếu muốn đồng bộ hoàn toàn
+        return ResponseEntity.status(ec.status())
+                .body(new ApiError(Instant.now(), ec.status().value(), ec.code(), ec.message(), req.getRequestURI()));
+    }
+    // ... các @ExceptionHandler khác của bạn (ví dụ bắt ApiException, MethodArgumentNotValidException)
+
+    /**
+     * Bắt lỗi khi người dùng không có quyền truy cập (Lỗi phân quyền từ @PreAuthorize)
+     */
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResponseEntity<ApiError> handlingAccessDeniedException(
+            AccessDeniedException exception, HttpServletRequest req) {
+
+        // Sử dụng ErrorCode.USER_NOT_AUTHORIZED mà bạn đã định nghĩa
+        ErrorCode ec = ErrorCode.USER_NOT_AUTHORIZED;
+
+        // Trả về ApiResponse chứa mã lỗi và HTTP Status 403 FORBIDDEN
         return ResponseEntity.status(ec.status())
                 .body(new ApiError(Instant.now(), ec.status().value(), ec.code(), ec.message(), req.getRequestURI()));
     }
