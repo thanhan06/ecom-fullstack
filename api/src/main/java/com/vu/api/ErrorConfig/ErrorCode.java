@@ -11,7 +11,17 @@ public enum ErrorCode {
     USERNAME_INVALID("USERNAME_INVALID", HttpStatus.BAD_REQUEST, "Username must be between 3 and 10 characters long"),
     USERNAME_BLANK("USERNAME_BLANK", HttpStatus.BAD_REQUEST, "Username cannot be blank"),
     USERID_BLANK("USERID_BLANK", HttpStatus.BAD_REQUEST, "User ID cannot be blank"),
-    PASSWORD_TOO_WEAK("PASSWORD_TOO_WEAK", HttpStatus.BAD_REQUEST, "Password must be at least 8 characters long");
+
+    // Token related error codes
+    REFRESH_TOKEN_NOT_FOUND("REFRESH_TOKEN_NOT_FOUND", HttpStatus.NOT_FOUND, "Refresh token not found"),
+    PASSWORD_TOO_WEAK("PASSWORD_TOO_WEAK", HttpStatus.BAD_REQUEST, "Password must be at least 8 characters long"),
+    INVALID_ACCESS_TOKEN("INVALID_ACCESS_TOKEN", HttpStatus.UNAUTHORIZED, "Invalid access token"),
+    INVALID_REFRESH_TOKEN("INVALID_REFRESH_TOKEN", HttpStatus.UNAUTHORIZED, "Invalid refresh token"),
+    REFRESH_TOKEN_NOT_BLANK("REFRESH_TOKEN_NOT_BLANK", HttpStatus.BAD_REQUEST, "Refresh token cannot be blank"),
+
+    // Server
+    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+
     private final String code;
     private final HttpStatus status;
     private final String message;
