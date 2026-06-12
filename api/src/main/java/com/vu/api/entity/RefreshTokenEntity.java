@@ -13,6 +13,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * Class RefreshTokenEntity để lưu trữ các refresh token trong Redis,
+ * bao gồm token (refresh token),
+ * userId (ID người dùng liên kết với refresh token) và
+ * timeToLive (thời gian tồn tại của refresh token, tính bằng ngày).
+ * Khi refresh token được tạo ra, nó sẽ tự động bị xóa sau khi timeToLive hết hạn.
+ */
 @RedisHash("refresh_token")
 @Getter
 @Setter

@@ -11,17 +11,27 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Class SecurityConfig to config Spring Security
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-
+    // Inject JwtAuthenticationFilter để sử dụng trong cấu hình bảo mật
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    // Constructor để inject JwtAuthenticationFilter
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    /**
+     * Cấu hình SecurityFilterChain để định nghĩa các quy tắc bảo mật cho API
+     * @param http đối tượng HttpSecurity để cấu hình bảo mật
+     * @return SecurityFilterChain đã được cấu hình
+     * @throws Exception nếu có lỗi xảy ra trong quá trình cấu hình bảo mật
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
@@ -55,6 +65,8 @@ public class SecurityConfig {
                         // 3. TẤT CẢ CÁC REQUEST CÒN LẠI ĐỀU PHẢI ĐĂNG NHẬP
                         .anyRequest()
                         .authenticated())
+                // Thêm JwtAuthenticationFilter vào trước UsernamePasswordAuthenticationFilter để lọc JWT token trước
+                // khi Spring Security xử lý xác thực
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults());
 

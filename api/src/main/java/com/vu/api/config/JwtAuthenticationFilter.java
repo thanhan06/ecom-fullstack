@@ -21,6 +21,9 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.vu.api.service.AuthenticationService;
 
+/**
+ * Class JwtAuthenticationFilter to filter JWT token from header and set authentication in Spring Security context
+ */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -28,12 +31,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private AuthenticationService authenticationService;
 
+    /**
+     * Override doFilterInternal để thực hiện lọc JWT token từ header và set authentication vào Spring Security context
+     * @param request đối tượng HttpServletRequest chứa thông tin của request
+     * @param response đối tượng HttpServletResponse để gửi phản hồi
+     * @param filterChain đối tượng FilterChain để tiếp tục luồng filter
+     * @throws ServletException nếu có lỗi xảy ra trong quá trình lọc
+     * @throws java.io.IOException nếu có lỗi I/O xảy ra trong quá trình lọc
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, java.io.IOException {
 
+        // Lấy header Authorization
         String authorizationHeader = request.getHeader("Authorization");
 
+        // Kiểm tra nếu header tồn tại và bắt đầu bằng "Bearer "
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
             // BƯỚC 2: Gọi hàm verify chuẩn chỉnh của bạn ở đây
@@ -45,9 +58,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SignedJWT signedJWT = SignedJWT.parse(token);
                     JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
 
+                    // Lấy userId từ subject và roles từ claim "roles"
                     String userId = claimsSet.getSubject();
                     List<String> roles = claimsSet.getStringListClaim("roles");
 
+                    // Chuyển roles thành SimpleGrantedAuthority để nạp vào Spring Security
                     List<SimpleGrantedAuthority> authorities = new ArrayList<>();
                     if (roles != null) {
                         for (String role : roles) {
@@ -55,14 +70,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         }
                     }
 
+                    // Tạo UserDetails giả với userId làm username, password rỗng (vì đã xác thực qua token), và
+                    // authorities từ roles
                     UserDetails principal = User.withUsername(userId)
                             .password("")
                             .authorities(authorities)
                             .build();
 
+                    // Tạo Authentication token và set vào SecurityContext
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(principal, null, authorities);
 
+                    // BƯỚC 3: Set authentication vào SecurityContext để Spring Security nhận diện được user đã xác thực
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 } catch (Exception e) {

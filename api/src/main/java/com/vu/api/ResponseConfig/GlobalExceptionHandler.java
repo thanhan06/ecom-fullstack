@@ -13,10 +13,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.vu.api.ErrorConfig.ApiException;
 import com.vu.api.ErrorConfig.ErrorCode;
 
+/**
+ * Class GlobalExceptionHandler để xử lý các lỗi toàn cục trong ứng dụng của bạn,
+ * bao gồm cả lỗi tùy chỉnh (ApiException) và lỗi validation (MethodArgumentNotValidException).
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 1. Xử lý các lỗi Custom Exception (Business Logic) của bạn
+    /**
+     * Bắt lỗi tùy chỉnh ApiException và trả về phản hồi lỗi chuẩn với mã lỗi, thông điệp và HTTP Status tương ứng.
+     * @param ex ApiException chứa thông tin về lỗi đã xảy ra.
+     * @param req HttpServletRequest để lấy thông tin về đường dẫn yêu cầu (path).
+     * @return ResponseEntity chứa ApiError với thông tin lỗi chuẩn.
+     */
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ApiError> handleApi(ApiException ex, HttpServletRequest req) {
         ErrorCode ec = ex.getErrorCode();
@@ -24,7 +33,13 @@ public class GlobalExceptionHandler {
                 .body(new ApiError(Instant.now(), ec.status().value(), ec.code(), ec.message(), req.getRequestURI()));
     }
 
-    // 2. Bổ sung: Xử lý lỗi Validation (Ví dụ: Password < 8 ký tự)
+    /**
+     * Bắt lỗi validation MethodArgumentNotValidException và trả về phản hồi lỗi chuẩn với mã lỗi,
+     * thông điệp và HTTP Status tương ứng.
+     * @param ex MethodArgumentNotValidException chứa thông tin về lỗi validation đã xảy ra
+     * @param req HttpServletRequest để lấy thông tin về đường dẫn yêu cầu (path).
+     * @return ResponseEntity chứa ApiError với thông tin lỗi chuẩn.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidationExceptions(
             MethodArgumentNotValidException ex, HttpServletRequest req) {
@@ -36,10 +51,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ec.status())
                 .body(new ApiError(Instant.now(), ec.status().value(), ec.code(), ec.message(), req.getRequestURI()));
     }
-    // ... các @ExceptionHandler khác của bạn (ví dụ bắt ApiException, MethodArgumentNotValidException)
 
     /**
-     * Bắt lỗi khi người dùng không có quyền truy cập (Lỗi phân quyền từ @PreAuthorize)
+     * Bắt lỗi AccessDeniedException khi người dùng không có quyền truy cập vào tài nguyên và trả về phản hồi lỗi chuẩn với mã lỗi,
+     * thông điệp và HTTP Status tương ứng.
+     * @param exception AccessDeniedException chứa thông tin về lỗi truy cập đã xảy ra
+     * @param req HttpServletRequest để lấy thông tin về đường dẫn yêu cầu (path).
+     * @return ResponseEntity chứa ApiError với thông tin lỗi chuẩn và HTTP Status 403 Forbidden.
      */
     @ExceptionHandler(value = AccessDeniedException.class)
     public ResponseEntity<ApiError> handlingAccessDeniedException(

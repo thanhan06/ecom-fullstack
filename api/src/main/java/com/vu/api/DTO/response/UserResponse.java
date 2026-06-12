@@ -10,6 +10,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * Class UserResponse để trả về dữ liệu người dùng,
+ * bao gồm psn_cd, userId, username, password, role, status,
+ * created_at, updated_at, create_psn_cd và updated_psn_id
+ */
 @Getter
 @Setter
 @Builder

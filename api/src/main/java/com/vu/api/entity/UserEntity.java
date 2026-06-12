@@ -16,6 +16,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * Class UserEntity để lưu trữ thông tin người dùng trong cơ sở dữ liệu,
+ * bao gồm psn_cd (ID người dùng), userId, username, password, role, status,
+ * created_at, updated_at, create_psn_cd và updated_psn_id
+ */
 @Entity
 @Getter
 @Setter

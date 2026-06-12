@@ -13,6 +13,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * Class BlackListTokenEntity để lưu trữ các token đã bị thu hồi (blacklist) trong Redis,
+ * bao gồm token (JWT) và timeToLive (thời gian tồn tại của token trong blacklist, tính bằng giây).
+ * Khi token được thêm vào blacklist, nó sẽ tự động bị xóa sau khi timeToLive hết hạn.
+ */
 @RedisHash("blacklist_token")
 @Getter
 @Setter
