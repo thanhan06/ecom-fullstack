@@ -48,7 +48,9 @@ public class SecurityConfig {
                         // Mở cửa API tạo refresh token
                         .requestMatchers("/refresh-token/**")
                         .permitAll()
-
+                        // Mở cửa API lấy danh sách loại sản phẩm
+                        .requestMatchers(HttpMethod.GET, "/product-types/**")
+                        .permitAll()
                         // 2. CÁC API LIÊN QUAN ĐẾN USER
                         // Mở cửa cho hành động tạo User mới (Đăng ký)
                         .requestMatchers(HttpMethod.POST, "/users")

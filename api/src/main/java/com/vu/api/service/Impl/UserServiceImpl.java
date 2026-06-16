@@ -95,14 +95,31 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserResponse createUser(UserCreationRequest userCreationRequest) {
-        // Kiểm tra xem userId đã tồn tại trong cơ sở dữ liệu hay chưa
-        if (userRepository.findByUserId(userCreationRequest.userId()).isPresent()) {
-            throw new ApiException(ErrorCode.USER_EXIST);
+        // Lấy role từ UserCreationRequest, nếu role không được cung cấp thì mặc định là "user"
+        String role =
+                userCreationRequest.role() != null ? userCreationRequest.role().toLowerCase() : "user";
+
+        // Lấy userId lớn nhất hiện tại trong cơ sở dữ liệu theo role để tạo userId mới cho người dùng mới
+        String userId = userRepository.findMaxUserId(role.toUpperCase());
+        int newUserId = 1; // Mặc định nếu chưa có người dùng nào
+
+        // Nếu userId tồn tại, tách phần số và tăng lên 1 để tạo userId mới
+        if (userId != null && !userId.isBlank()) {
+            String numberPart = userId.replaceAll("[^0-9]", "");
+            if (!numberPart.isBlank()) {
+                newUserId = Integer.parseInt(numberPart) + 1;
+            }
         }
+
+        // Tạo userId mới theo định dạng "role + số thứ tự 3 chữ số", ví dụ: "user001", "admin002"
+        String newUserIdStr = String.format("%s%03d", role, newUserId);
 
         // Chuyển đổi UserCreationRequest thành UserEntity, mã hóa mật khẩu nếu có, lưu vào cơ sở dữ liệu và trả về
         // UserResponse
         UserEntity userEntity = userMapper.toUserEntity(userCreationRequest);
+
+        // Gán userId và password mới cho UserEntity
+        userEntity.setUserId(newUserIdStr);
         userEntity.setPassword(
                 userCreationRequest.password().isBlank()
                         ? null

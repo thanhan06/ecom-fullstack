@@ -9,6 +9,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,9 +43,17 @@ public class UserEntity {
     String username;
     String password;
     String role;
-    Boolean status;
+
+    @Builder.Default
+    Boolean status = true;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     Timestamp created_at;
+
+    @UpdateTimestamp
     Timestamp updated_at;
+
     int create_psn_cd;
-    int updated_psn_id;
+    int update_psn_cd;
 }

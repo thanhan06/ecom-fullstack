@@ -1,8 +1,10 @@
 package com.vu.api.ResponseConfig;
 
 import java.time.Instant;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -30,7 +32,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleApi(ApiException ex, HttpServletRequest req) {
         ErrorCode ec = ex.getErrorCode();
         return ResponseEntity.status(ec.status())
-                .body(new ApiError(Instant.now(), ec.status().value(), ec.code(), ec.message(), req.getRequestURI()));
+                .body(new ApiError(
+                        Instant.now(), ec.status().value(), ec.code(), ex.getMessage(), req.getRequestURI()));
     }
 
     /**
@@ -43,13 +46,36 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidationExceptions(
             MethodArgumentNotValidException ex, HttpServletRequest req) {
-        // Lấy câu thông báo lỗi mặc định mà bạn đã define trong DTO (VD: "Password must be at least 8 characters long")
-        String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-        ErrorCode ec = ErrorCode.valueOf(errorMessage); // Chuyển message thành ErrorCode enum
-        // Trả về HTTP Status 400 (Bad Request) cùng với format ApiError của bạn
-        // Lưu ý: Chỗ "VALIDATION_ERROR" bạn có thể đổi thành một Enum ErrorCode nếu muốn đồng bộ hoàn toàn
+
+        String errorMessageKey = ex.getBindingResult().getFieldError().getDefaultMessage();
+        ErrorCode ec;
+        String finalMessage;
+
+        try {
+            ec = ErrorCode.valueOf(errorMessageKey);
+            finalMessage = ec.message(); // Lấy chuỗi gốc: "Username must be between {min} and {max}..."
+
+            // Mở gói lỗi để lấy Map chứa toàn bộ các tham số của Annotation (min, max, value...)
+            var constraintViolation = ex.getBindingResult().getFieldError().unwrap(ConstraintViolation.class);
+            Map<String, Object> attributes =
+                    constraintViolation.getConstraintDescriptor().getAttributes();
+
+            // VÒNG LẶP THẦN THÁNH: Tự động dò tìm và thay thế mọi placeholder
+            for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+                String placeholder = "{" + entry.getKey() + "}"; // Tạo chuỗi dạng {min}, {max}
+
+                // Nếu trong câu thông báo có chứa {min} hoặc {max}, tự động thay bằng số thực tế
+                if (finalMessage.contains(placeholder)) {
+                    finalMessage = finalMessage.replace(placeholder, String.valueOf(entry.getValue()));
+                }
+            }
+        } catch (Exception e) {
+            ec = ErrorCode.INTERNAL_SERVER_ERROR;
+            finalMessage = errorMessageKey != null ? errorMessageKey : "Validation error";
+        }
+
         return ResponseEntity.status(ec.status())
-                .body(new ApiError(Instant.now(), ec.status().value(), ec.code(), ec.message(), req.getRequestURI()));
+                .body(new ApiError(Instant.now(), ec.status().value(), ec.code(), finalMessage, req.getRequestURI()));
     }
 
     /**

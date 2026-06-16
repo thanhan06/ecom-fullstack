@@ -18,13 +18,13 @@
 
 | Item name | Key | Type | Length | Necessary |
 |---|---|---|---|---|
-| producttype_id | PK | integer | 4 | x |
+| product_type_id | PK | varchar | 50 | x |
 | name | | varchar | 200 | |
-| status | | bit | 1 | |
+| status | | boolean | 1 | |
 | createtime | | timestamp | | |
-| create_user | FK | integer | 4 | |
+| create_user |  | varchar | 50 | |
 | updatetime | | timestamp | | |
-| update_user | FK | integer | 4 | |
+| update_user |  | varchar | 50 | |
 
 ## mstproduct
 
