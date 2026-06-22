@@ -1,6 +1,7 @@
 package com.vu.api.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,4 +22,7 @@ public interface ProductTypeRepository extends JpaRepository<ProductTypeEntity, 
 
     @Query(value = "SELECT MAX(p.product_type_id) FROM mstproducttype p", nativeQuery = true)
     public String findMaxProductTypeId();
+
+    // Tự động sinh câu lệnh: SELECT * FROM mstproducttype WHERE product_type_id = ? AND status = true
+    public Optional<ProductTypeEntity> findByProductTypeIdAndStatusTrue(String productTypeId);
 }

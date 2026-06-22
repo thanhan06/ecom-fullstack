@@ -36,8 +36,20 @@ public enum ErrorCode {
     PRODUCT_TYPE_NAME_IS_NOT_BLANK(
             "PRODUCT_TYPE_NAME_IS_NOT_BLANK", HttpStatus.BAD_REQUEST, "Product type name cannot be blank"),
     PRODUCT_TYPE_NAME_IS_EXIST("PRODUCT_TYPE_NAME_IS_EXIST", HttpStatus.CONFLICT, "Product type name already exist"),
-    PRODUCT_TYPE_NOT_FOUND("PRODUCT_TYPE_NOT_FOUND", HttpStatus.NOT_FOUND, "Product type not found");
+    PRODUCT_TYPE_NOT_FOUND("PRODUCT_TYPE_NOT_FOUND", HttpStatus.NOT_FOUND, "Product type not found"),
 
+    // Product related error codes
+    PRODUCT_NOT_FOUND("PRODUCT_NOT_FOUND", HttpStatus.NOT_FOUND, "Product not found"),
+    PRODUCT_NAME_IS_EXIST("PRODUCT_NAME_IS_EXIST", HttpStatus.CONFLICT, "Product name already exist"),
+    PRODUCT_NAME_IS_NOT_BLANK("PRODUCT_NAME_IS_NOT_BLANK", HttpStatus.BAD_REQUEST, "Product name cannot be blank"),
+    PRODUCT_AMOUNT_IS_NOT_NULL("PRODUCT_AMOUNT_IS_NOT_NULL", HttpStatus.BAD_REQUEST, "Product amount cannot be null"),
+    PRODUCT_AMOUNT_IS_NOT_NEGATIVE(
+            "PRODUCT_AMOUNT_IS_NOT_NEGATIVE", HttpStatus.BAD_REQUEST, "Product amount cannot be negative"),
+    PRODUCT_PRICE_IS_NOT_NULL("PRODUCT_PRICE_IS_NOT_NULL", HttpStatus.BAD_REQUEST, "Product price cannot be null"),
+    PRODUCT_PRICE_IS_NOT_NEGATIVE(
+            "PRODUCT_PRICE_IS_NOT_NEGATIVE", HttpStatus.BAD_REQUEST, "Product price cannot be negative"),
+    PRODUCT_TYPE_ID_IS_NOT_BLANK(
+            "PRODUCT_TYPE_ID_IS_NOT_BLANK", HttpStatus.BAD_REQUEST, "Product type ID cannot be blank");
     private final String code;
     private final HttpStatus status;
     private final String message;

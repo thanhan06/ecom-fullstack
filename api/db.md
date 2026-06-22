@@ -30,18 +30,18 @@
 
 | Item name | Key | Type | Length | Necessary |
 |---|---|---|---|---|
-| product_id | PK | bigint | 8 | x |
+| product_id | PK | varchar | 50 | x |
 | product_name | | varchar | 200 | |
-| status | | bit | 1 | |
-| description | | varchar | 400 | |
+| status | | boolean | 1 | |
+| description | | varchar | 500 | |
 | product_img | | varchar | 500 | |
 | product_amount | | integer | 4 | |
 | price | | bigint | 8 | |
-| producttype_id | FK | integer | 4 | |
+| product_type_id | FK | varchar | 50 | |
 | createtime | | timestamp | | |
-| create_user | FK | integer | 4 | |
+| create_user |  | character | 8 | |
 | updatetime | | timestamp | | |
-| update_user | FK | integer | 4 | |
+| update_user |  | character | 8 | |
 
 ## trproductorder
 
@@ -60,3 +60,8 @@
 | create_user | FK | integer | 4 | |
 | updatetime | | timestamp | | |
 | update_user | FK | integer | 4 | |
+
+
+
+
+- cho nhap tu file excel

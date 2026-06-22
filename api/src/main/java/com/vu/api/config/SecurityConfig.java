@@ -51,6 +51,9 @@ public class SecurityConfig {
                         // Mở cửa API lấy danh sách loại sản phẩm
                         .requestMatchers(HttpMethod.GET, "/product-types/**")
                         .permitAll()
+                        // Mở cửa API lấy danh sách sản phẩm
+                        .requestMatchers(HttpMethod.GET, "/products/**")
+                        .permitAll()
                         // 2. CÁC API LIÊN QUAN ĐẾN USER
                         // Mở cửa cho hành động tạo User mới (Đăng ký)
                         .requestMatchers(HttpMethod.POST, "/users")
@@ -67,6 +70,9 @@ public class SecurityConfig {
                         // 3. TẤT CẢ CÁC REQUEST CÒN LẠI ĐỀU PHẢI ĐĂNG NHẬP
                         .anyRequest()
                         .authenticated())
+
+                // Cấu hình JwtAuthenticationEntryPoint để xử lý lỗi xác thực
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
                 // Thêm JwtAuthenticationFilter vào trước UsernamePasswordAuthenticationFilter để lọc JWT token trước
                 // khi Spring Security xử lý xác thực
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
