@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.vu.api.DTO.request.ProductCreationRequest;
+import com.vu.api.DTO.request.ProductUpdationRequest;
 import com.vu.api.DTO.response.ProductResponse;
 import com.vu.api.ErrorConfig.ApiException;
 import com.vu.api.ErrorConfig.ErrorCode;
@@ -99,5 +100,67 @@ public class ProductServiceImpl implements ProductService {
 
         // 4. Map sang DTO và trả về
         return productEntities.map(productMapper::toProductResponse);
+    }
+
+    @Override
+    public void deleteProduct(String productId) {
+        ProductEntity productEntity =
+                productRepository.findById(productId).orElseThrow(() -> new ApiException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        if (!productEntity.isStatus()) {
+            throw new ApiException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
+
+        String deleteUserId =
+                SecurityContextHolder.getContext().getAuthentication().getName();
+
+        productEntity.setStatus(false);
+        productEntity.setUpdatedUser(deleteUserId);
+
+        productRepository.save(productEntity);
+    }
+
+    @Override
+    public ProductResponse updateProduct(String productId, ProductUpdationRequest request) {
+        ProductEntity productEntity =
+                productRepository.findById(productId).orElseThrow(() -> new ApiException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        if (!productEntity.isStatus()) {
+            throw new ApiException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
+
+        String updateUserId =
+                SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // Cập nhật các trường nếu có dữ liệu
+        if (request.productName().isPresent()) {
+            String newProductName = request.productName().get();
+            if (!newProductName.equals(productEntity.getProductName())
+                    && productRepository.existsByProductName(newProductName)) {
+                throw new ApiException(ErrorCode.PRODUCT_NAME_IS_EXIST);
+            }
+            productEntity.setProductName(newProductName);
+        }
+
+        if (request.price().isPresent()) {
+            productEntity.setPrice(request.price().get());
+        }
+
+        if (request.productAmount().isPresent()) {
+            productEntity.setProductAmount(request.productAmount().get());
+        }
+
+        if (request.productTypeId().isPresent()) {
+            String newProductTypeId = request.productTypeId().get();
+            ProductTypeEntity productType = productTypeRepository
+                    .findByProductTypeIdAndStatusTrue(newProductTypeId)
+                    .orElseThrow(() -> new ApiException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
+            productEntity.setProductType(productType);
+        }
+
+        productEntity.setUpdatedUser(updateUserId);
+
+        productEntity = productRepository.save(productEntity);
+        return productMapper.toProductResponse(productEntity);
     }
 }

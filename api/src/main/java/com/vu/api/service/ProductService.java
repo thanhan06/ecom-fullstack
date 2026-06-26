@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.vu.api.DTO.request.ProductCreationRequest;
+import com.vu.api.DTO.request.ProductUpdationRequest;
 import com.vu.api.DTO.response.ProductResponse;
 
 @Service
@@ -16,4 +17,8 @@ public interface ProductService {
 
     public Page<ProductResponse> getActiveProductsWithFilters(
             String productName, String productTypeId, String description, int page, int size);
+
+    public void deleteProduct(String productId);
+
+    public ProductResponse updateProduct(String productId, ProductUpdationRequest request);
 }
