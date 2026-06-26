@@ -8,4 +8,5 @@ public record ProductResponse(
         String productImg,
         Integer productAmount,
         Long price,
-        String productTypeId) {}
+        String productTypeId,
+        String productTypeName) {}

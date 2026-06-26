@@ -3,6 +3,10 @@ package com.vu.api.service.Impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -68,5 +72,32 @@ public class ProductServiceImpl implements ProductService {
         productEntity.setCreateUser(createUserId);
         productEntity = productRepository.save(productEntity);
         return productMapper.toProductResponse(productEntity);
+    }
+
+    @Override
+    public Page<ProductResponse> getActiveProductsWithFilters(
+            String productName, String productTypeId, String description, int page, int size) {
+
+        // 1. Cấu hình Pageable kèm Sort để dữ liệu phân trang luôn cố định (ví dụ: sản phẩm mới lên đầu)
+        Pageable pageable = PageRequest.of(page, size, Sort.by("productId").ascending());
+
+        // 2. Chuẩn hóa dữ liệu: Biến chuỗi rỗng "" hoặc chuỗi toàn dấu cách thành null
+        // Đón đầu xử lý: Chuyển thành chữ thường và bọc dấu % ngay trên Java nếu có dữ liệu
+        String searchName = (productName != null && !productName.isBlank())
+                ? "%" + productName.trim().toLowerCase() + "%"
+                : null;
+
+        String searchDesc = (description != null && !description.isBlank())
+                ? "%" + description.trim().toLowerCase() + "%"
+                : null;
+
+        String searchTypeId = (productTypeId != null && !productTypeId.isBlank()) ? productTypeId.trim() : null;
+
+        // 3. Truy vấn Database với các tham số đã an toàn
+        Page<ProductEntity> productEntities =
+                productRepository.findActiveProductsWithFilters(searchName, searchTypeId, searchDesc, pageable);
+
+        // 4. Map sang DTO và trả về
+        return productEntities.map(productMapper::toProductResponse);
     }
 }
